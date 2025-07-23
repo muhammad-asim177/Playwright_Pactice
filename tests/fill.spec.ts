@@ -45,3 +45,16 @@ test('Login with Empty user name and password', async ({ page }) => {
   await expect(errorMessage2).toBeVisible();
 
 });
+
+test('Forget password', async ({ page }) => {
+  await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login');
+  await page.getByText('Forgot your password?').click();
+  await page.getByRole('textbox', { name: 'Username' }).fill('admin.a665@gmail.com');
+  await page.getByRole('button', { name: 'Reset Password' }).click()
+  await page.waitForTimeout(5000);
+
+
+  const sucessMessage = page.getByRole('heading', { name: 'Reset Password link sent' })
+  await expect(sucessMessage).toBeVisible();
+  await page.waitForTimeout(3000);
+});
