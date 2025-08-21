@@ -26,3 +26,21 @@ jobs:
 
       - name: Run Playwright tests
         run: npx playwright test
+
+      - name: Zip Playwright HTML Report
+        if: always()  # Run even if tests fail
+        run: powershell Compress-Archive -Path playwright-report -DestinationPath report.zip
+
+      - name: Send Email with Report
+        if: always()  # Send even if tests fail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.EMAIL_SERVER }}
+          server_port: ${{ secrets.EMAIL_PORT }}
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: Playwright Test Report
+          body: Playwright test report is attached.
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.EMAIL_USERNAME }}
+          attachments: report.zip
