@@ -24,15 +24,22 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install
 
-      - name: Run Playwright tests
+      - name: Run Playwright Tests
         run: npx playwright test
 
       - name: Zip Playwright HTML Report
-        if: always()  # Run even if tests fail
+        if: always()
         run: powershell Compress-Archive -Path playwright-report -DestinationPath report.zip
 
-      - name: Send Email with Report
-        if: always()  # Send even if tests fail
+      - name: Upload Report Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-html-report
+          path: report.zip
+
+      - name: Send Report via Gmail
+        if: always()
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: ${{ secrets.EMAIL_SERVER }}
@@ -40,7 +47,13 @@ jobs:
           username: ${{ secrets.EMAIL_USERNAME }}
           password: ${{ secrets.EMAIL_PASSWORD }}
           subject: Playwright Test Report
-          body: Playwright test report is attached.
+          body: |
+            Hello,
+
+            The Playwright test report is attached as a zip file.
+
+            Best,
+            GitHub Actions
           to: ${{ secrets.EMAIL_TO }}
           from: ${{ secrets.EMAIL_USERNAME }}
           attachments: report.zip
