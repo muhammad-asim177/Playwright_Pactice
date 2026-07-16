@@ -7,6 +7,7 @@ pipeline {
 
     environment {
         EMAIL_TO = 'muhammad.asimsqa177@gmail.com'
+        PLAYWRIGHT_BROWSERS_PATH = 'C:\\PlaywrightBrowsers'
     }
 
     options {
@@ -32,11 +33,14 @@ pipeline {
             }
         }
 
-        stage('Verify Node Installation') {
+        stage('Verify Environment') {
             steps {
                 bat '''
                 node -v
                 npm -v
+                git --version
+                echo Browser Path:
+                echo %PLAYWRIGHT_BROWSERS_PATH%
                 '''
             }
         }
@@ -44,12 +48,6 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 bat 'npm ci'
-            }
-        }
-
-        stage('Install Playwright Browsers') {
-            steps {
-                bat 'npx playwright install'
             }
         }
 
@@ -86,7 +84,6 @@ pipeline {
     }
 
     post {
-
         always {
             archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
             archiveArtifacts artifacts: 'allure-results/**', allowEmptyArchive: true
@@ -99,26 +96,15 @@ pipeline {
                 subject: "✅ BUILD SUCCESS | ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 mimeType: 'text/html',
                 body: """
-                <h2 style="color:green;">Build Passed ✅</h2>
+                <h2>Build Passed ✅</h2>
 
-                <table border="1" cellpadding="6" cellspacing="0">
-                    <tr><td><b>Job</b></td><td>${env.JOB_NAME}</td></tr>
-                    <tr><td><b>Build</b></td><td>#${env.BUILD_NUMBER}</td></tr>
-                    <tr><td><b>Status</b></td><td>SUCCESS</td></tr>
-                    <tr><td><b>Build URL</b></td><td><a href="${env.BUILD_URL}">${env.BUILD_URL}</a></td></tr>
-                </table>
+                <b>Job:</b> ${env.JOB_NAME}<br>
+                <b>Build:</b> #${env.BUILD_NUMBER}<br>
+                <b>Build URL:</b>
+                <a href="${env.BUILD_URL}">${env.BUILD_URL}</a><br><br>
 
-                <br>
-
-                <b>Allure Report:</b><br>
-                <a href="${env.BUILD_URL}allure">${env.BUILD_URL}allure</a>
-
-                <br><br>
-
-                <b>Playwright HTML Report:</b><br>
-                <a href="${env.BUILD_URL}Playwright_20HTML_20Report/">
-                    Open Playwright HTML Report
-                </a>
+                <a href="${env.BUILD_URL}allure">Allure Report</a><br>
+                <a href="${env.BUILD_URL}Playwright_20HTML_20Report/">Playwright HTML Report</a>
                 """
             )
         }
@@ -129,30 +115,19 @@ pipeline {
                 subject: "❌ BUILD FAILED | ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 mimeType: 'text/html',
                 body: """
-                <h2 style="color:red;">Build Failed ❌</h2>
+                <h2>Build Failed ❌</h2>
 
-                <table border="1" cellpadding="6" cellspacing="0">
-                    <tr><td><b>Job</b></td><td>${env.JOB_NAME}</td></tr>
-                    <tr><td><b>Build</b></td><td>#${env.BUILD_NUMBER}</td></tr>
-                    <tr><td><b>Status</b></td><td>FAILED</td></tr>
-                    <tr><td><b>Build URL</b></td><td><a href="${env.BUILD_URL}">${env.BUILD_URL}</a></td></tr>
-                </table>
+                <b>Job:</b> ${env.JOB_NAME}<br>
+                <b>Build:</b> #${env.BUILD_NUMBER}<br>
 
-                <br>
-
-                <b>Console Log:</b><br>
-                <a href="${env.BUILD_URL}console">${env.BUILD_URL}console</a>
-
-                <br><br>
-
-                <b>Allure Report:</b><br>
-                <a href="${env.BUILD_URL}allure">${env.BUILD_URL}allure</a>
+                <a href="${env.BUILD_URL}console">Console Log</a><br>
+                <a href="${env.BUILD_URL}allure">Allure Report</a>
                 """
             )
         }
 
         cleanup {
-            echo 'Pipeline completed.'
+            echo 'Pipeline Completed.'
         }
     }
 }
