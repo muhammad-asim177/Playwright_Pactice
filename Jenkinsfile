@@ -39,16 +39,12 @@ pipeline {
         }
 
         stage('Install Chromium Browser') {
-            steps {
-                bat '''
-                if exist "%USERPROFILE%\\AppData\\Local\\ms-playwright" (
-                    echo Playwright browsers already installed.
-                ) else (
-                    echo Installing Chromium...
-                    npx playwright install chromium
-                )
-                '''
-            }
+    steps {
+        bat '''
+        npx playwright install chromium --with-deps
+        '''
+    }
+}
         }
 
         stage('Run Playwright Tests') {
