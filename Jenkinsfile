@@ -32,19 +32,25 @@ pipeline {
             }
         }
 
+        stage('Verify Node Installation') {
+            steps {
+                bat '''
+                node -v
+                npm -v
+                '''
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
                 bat 'npm ci'
             }
         }
 
-        stage('Install Chromium Browser') {
-    steps {
-        bat '''
-        npx playwright install chromium --with-deps
-        '''
-    }
-}
+        stage('Install Playwright Browsers') {
+            steps {
+                bat 'npx playwright install'
+            }
         }
 
         stage('Run Playwright Tests') {
@@ -105,15 +111,13 @@ pipeline {
                 <br>
 
                 <b>Allure Report:</b><br>
-                <a href="${env.BUILD_URL}allure">
-                ${env.BUILD_URL}allure
-                </a>
+                <a href="${env.BUILD_URL}allure">${env.BUILD_URL}allure</a>
 
                 <br><br>
 
                 <b>Playwright HTML Report:</b><br>
-                <a href="${env.BUILD_URL}Playwright_HTML_Report">
-                ${env.BUILD_URL}Playwright_HTML_Report
+                <a href="${env.BUILD_URL}Playwright_20HTML_20Report/">
+                    Open Playwright HTML Report
                 </a>
                 """
             )
@@ -137,16 +141,12 @@ pipeline {
                 <br>
 
                 <b>Console Log:</b><br>
-                <a href="${env.BUILD_URL}console">
-                ${env.BUILD_URL}console
-                </a>
+                <a href="${env.BUILD_URL}console">${env.BUILD_URL}console</a>
 
                 <br><br>
 
                 <b>Allure Report:</b><br>
-                <a href="${env.BUILD_URL}allure">
-                ${env.BUILD_URL}allure
-                </a>
+                <a href="${env.BUILD_URL}allure">${env.BUILD_URL}allure</a>
                 """
             )
         }
